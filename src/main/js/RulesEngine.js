@@ -27,21 +27,23 @@ var RulesEngine = {
 
     WILDCARD: function(){return true},
     WC: this.WILDCARD,
-    debug: true,
+    debug: false,
 
     build: function(twoDimRulesArray, defaultFunction){
-        if (console && this.debug){ console.log('=== Building Rules Engine ===') }
+        var thiz = this, logDebug = console && thiz.debug
+        if (logDebug){ console.log('=== Building Rules Engine ===') }
         var rules = this.buildRules(twoDimRulesArray, defaultFunction)
-        var thiz = this
         return {
             evaluate: function(inputs){
+                var logDebug = console && thiz.debug
+                if (logDebug){ console.log('--- Evaluating inputs= '+thiz.objectToString(inputs)+' ---') }
                 for (var i = 0; i < rules.length; i++){
                     if (thiz.equals(rules[i].condition, inputs)){    // if we have a match
 						var response = rules[i].then(rules[i].params)
-						if (console){ console.log('Found match: ' + response) }
+						if (logDebug){ console.log('Found rule match: ' + rules[i].toString() + ' output:' + response) }
                         return response;
                     } else {
-						if (console){ console.log('Could not find match for inputs: ' + thiz.objectToString(inputs)) }
+						if (logDebug){ console.log('Could not find match for inputs: ' + thiz.objectToString(inputs)) }
 					}
                 }
             }
@@ -49,7 +51,7 @@ var RulesEngine = {
     },
 
     buildRules: function(twoDimensionalArray, defaultFunction){
-        var thiz = this
+        var thiz = this, logDebug = console && thiz.debug
         var rules = []
         var tmp = twoDimensionalArray[0] // first row is the list of fields
         var fieldNames = thiz.findAll(tmp, function(a){ return a.indexOf && a.indexOf('p_') === -1 })
@@ -59,7 +61,7 @@ var RulesEngine = {
 		}
         for (var i = 1; i < twoDimensionalArray.length; i++){
             var tmp = this.buildRule(fieldNames, inputNames, twoDimensionalArray[i], defaultFunction)
-            if (console){ console.log(tmp.toString()) }
+            if (logDebug){ console.log(tmp.toString()) }
             if (typeof tmp !== 'undefined' && tmp !== null){
                 rules[rules.length] = tmp
             }
@@ -68,7 +70,7 @@ var RulesEngine = {
     },
 
     buildRule: function(fieldNames, inputNames, conditions, defaultCondition){
-        var thiz = this
+        var thiz = this, logDebug = console && thiz.debug
         defaultCondition = typeof defaultCondition === 'undefined' ? function(){} : defaultCondition
         if (typeof conditions !== 'undefined'){
             var fnlen = fieldNames.length, inlen = inputNames.length
@@ -91,6 +93,7 @@ var RulesEngine = {
     },
     
     objectToString: function(map){
+        var thiz = this, logDebug = console && thiz.debug
         var keys = this.getKeys(map)
         var string = '('
         if (keys.length > 0){
@@ -106,20 +109,22 @@ var RulesEngine = {
     },
     
     getKeys: function(obj){
-       var keys = []
-       for(var key in obj){ keys[keys.length] = key }
-       return keys
+        var thiz = this, logDebug = console && thiz.debug
+        var keys = []
+        for(var key in obj){ keys[keys.length] = key }
+        return keys
     },
     
     /* -- N.B. These below methods should be in a common library. -- */
 
     /* does a deep match, of 1st level fields, of an object */
     equals: function(a, b){
+        var thiz = this, logDebug = console && thiz.debug
         for (var field in a){
             if (a.hasOwnProperty(field)) {
-				var matches = (typeof expected === 'function' && expected(b[field])) || a[field] == b[field]
+				var matches = a[field] == b[field]//(typeof expected === 'function' && expected(b[field])) || a[field] == b[field]
 				if (!matches){
-                    if (console && true){ console.log('Rejecting match on field=' + field + ' - ' + a[field] + ' != ' + b[field]) }
+                    if (logDebug){ console.log('Rejecting match on field=' + field + ' - ' + a[field] + ' != ' + b[field]) }
                     return false;
                 }
             }
@@ -129,6 +134,7 @@ var RulesEngine = {
     
     /* finds all matches - see groovy! */ 
     findAll: function(list, closure){
+        var thiz = this, logDebug = console && thiz.debug
         var tmp=[], clos = closure;
         for (var i=0;i<list.length;i++){
             if (clos(list[i])){
@@ -140,6 +146,7 @@ var RulesEngine = {
     
     /* collects all non-undefined objects */ 
     collect: function(list, closure){
+        var thiz = this, logDebug = console && thiz.debug
         var tmp=[], clos = closure;
         for (var i=0;i<list.length;i++){
             var val = clos(list[i], i)
