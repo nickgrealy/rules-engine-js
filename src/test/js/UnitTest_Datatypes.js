@@ -4,7 +4,7 @@
  *
  */
 
-/* --- Start Setup --- */
+/* ====== Start Setup ====== */
 
 var defaultFunction = function(){
     var args = Array.prototype.slice.call(arguments)
@@ -13,43 +13,54 @@ var defaultFunction = function(){
 }
 
 var obj1 = {a:1}, obj2 = {b:2}, obj3 = {c:3}, obj4 = {d:4}
-var startsWithAA = function(a){
-    return a && a.indexOf && a.indexOf('AA') == 0
-}
-var startsWithBB = function(a){
-    return a && a.indexOf && a.indexOf('BB') == 0
-}
+var startsWithAA = function(a){ return a && a.indexOf && a.indexOf('AA') == 0 }
+var startsWithBB = function(a){ return a && a.indexOf && a.indexOf('BB') == 0 }
 
-var rules1 = [
+var rules1 = [ /* Test Simple Datatypes */
   ['c1',            'c2',           'p_out1',       'p_out2'        ], // Controls / Parameters
   // ---------------------------------------------------------------|
-  ['string1',       'string2',      'aaa',          'bbb'           ], // Strings
-  [123,             456,            111,            222             ], // Numbers
-  [true,            false,          true,           false           ], // Booleans
-  [obj1,            obj2,           obj3,           obj4            ], // Objects
-  [[1,2],           [3,4],          [5,6],          [7,8]           ], // Arrays
-  [startsWithAA,    startsWithBB,   startsWithAA,   startsWithBB    ], // Functions
-  [undefined,       undefined,      undefined,      undefined       ], // Undefined
-  [null,            null,           null,           null            ], // Null
+  ['string1',       'string2',      'aaa',          'bbb',          ], // Strings
+  [123,             456,            111,            222,            ], // Numbers
+  [true,            false,          true,           false,          ], // Booleans
+  [obj1,            obj2,           obj3,           obj4,           ], // Objects
+  [[1,2],           [3,4],          [5,6],          [7,8],          ], // Arrays
+  [startsWithAA,    startsWithBB,   startsWithAA,   startsWithBB,   ], // Functions
+  [undefined,       undefined,      undefined,      undefined,      ], // Undefined
+  [null,            null,           null,           null,           ], // Null
 ]
 
-var rules2 = [
-  ['c1',            'c2',           'p_out1',       'p_out2'        ], // Controls / Parameters
+var rules2 = [ /* Test Undefined/Null/Blanks */
+  ['c1',            'c2',           'p_out1',       'p_out2'        ],
   // ---------------------------------------------------------------|
-  ['string1',       'string2',      'aaa',          'bbb'           ], // Strings
+  ['string1',       'string2',      'aaa',          'bbb'           ],
 ]
 
-var rules3 = [
-  ['c1',            'c2',           'p_out1',       'p_out2'        ], // Controls / Parameters
+var rules3 = [ /* Test wildcards */
+  ['c1',            'c2',           'p_out1',       'p_out2'        ],
   // ---------------------------------------------------------------|
-  ['string1',       'string2',      'aaa',          'bbb'           ], // Strings
-  [_RE.WC,          _RE.WC,         _RE.WC,         _RE.WC          ], // Wildcard
+  ['string1',       'string2',      'aaa',          'bbb'           ],
+  [_RE.WC,          _RE.WC,         'WC1',          'WC2'           ], // Wildcard
+]
+
+var thenOverride1 = function(a){ return 'one' }
+var thenOverride2 = function(a){ return 'two' }
+
+var rules4 = [ /* Test override 'then' functions */
+  ['scenario',  'p_out1'    ],
+  // -----------------------|
+  ['one',       'param1',   ],
+  ['two',       'param2',   thenOverride2],
 ]
 
 var engine1 = RulesEngine.build(rules1, defaultFunction)
 var engine2 = RulesEngine.build(rules2, defaultFunction)
+var engine3 = RulesEngine.build(rules3, defaultFunction)
 
-/* --- End of setup --- */
+// test default and override "then" functions
+var engine4 = RulesEngine.build(rules4)
+var engine5 = RulesEngine.build(rules4, thenOverride1)
+
+/* ====== End of setup ====== */
 
 QUnit.module( "--- Undefined/Null/Blank ---" );
 
@@ -106,15 +117,41 @@ QUnit.test( "Functions that don't match", function( assert ) {
 });
 
 // Undefined
+QUnit.test( "Undefined that match", function( assert ) {
+    assert.ok( engine1.evaluate({}) == 'defaultFunction -> arguments: (out1=undefined,out2=undefined)' )
+});
+QUnit.test( "Undefined that don't match", function( assert ) {
+    assert.ok( engine1.evaluate({c2:'BAR'}) == null )
+});
 
-// Null
+// Null */
+QUnit.test( "Null that match", function( assert ) {
+    assert.ok( engine1.evaluate({c1:null,c2:null}) == 'defaultFunction -> arguments: (out1=null,out2=null)' )
+});
+QUnit.test( "Null that don't match", function( assert ) {
+    assert.ok( engine1.evaluate({c1:null,c2:'bar'}) == null )
+});
 
-// Wildcard
+// Wildcard - (N.B. wildcard is simply a function, that always evaluates to true!)
+QUnit.test( "Wildcards (always match)", function( assert ) {
+    assert.ok( engine3.evaluate({c1:'foo',c2:null}) == 'defaultFunction -> arguments: (out1=WC1,out2=WC2)' )
+});
+// No negative scenario because wildcards (by their nature) always match!
 
+QUnit.module( "--- 'Then' Functions ---" );
 
-QUnit.module( "--- Custom Then Function ---" );
-
-
+QUnit.test( "No default, no override", function( assert ) {
+    assert.ok( engine4.evaluate({scenario:'one'}) == null )
+});
+QUnit.test( "No default w/ override", function( assert ) {
+    assert.ok( engine4.evaluate({scenario:'two'}) == 'two' )
+});
+QUnit.test( "Default, no override", function( assert ) {
+    assert.ok( engine5.evaluate({scenario:'one'}) == 'one' )
+});
+QUnit.test( "Default w/ override", function( assert ) {
+    assert.ok( engine5.evaluate({scenario:'two'}) == 'two' )
+});
 
 
 

@@ -26,7 +26,7 @@ var result = engine.evaluate({outcome: 'Review Held', documentToProduce: 'ROA Sh
 var RulesEngine = {
 
     WILDCARD: function(){return true},
-    WC: this.WILDCARD,
+    WC: function(){return true},
     debug: false,
 
     build: function(twoDimRulesArray, defaultFunction){
@@ -41,15 +41,19 @@ var RulesEngine = {
                     return
                 }
                 if (logDebug){ console.log('--- Evaluating inputs= '+thiz.objectToString(inputs)+' ---') }
+                var returnResponse = null
                 for (var i = 0; i < rules.length; i++){
                     if (thiz.equals(rules[i].condition, inputs)){    // if we have a match
 						var response = rules[i].then(rules[i].params)
 						if (logDebug){ console.log('Found rule match: ' + rules[i].toString() + ' output:' + response) }
-                        return response;
-                    } else {
-						if (logDebug){ console.log('Could not find match for inputs: ' + thiz.objectToString(inputs)) }
-					}
+                        returnResponse = response
+                        break
+                    }
                 }
+                if (returnResponse == null){
+                    if (logDebug){ console.log('Response was null for inputs: ' + thiz.objectToString(inputs)) }
+                }
+                return returnResponse
             }
         };
     },
@@ -126,7 +130,9 @@ var RulesEngine = {
         var thiz = this, logDebug = console && thiz.debug
         for (var field in a){
             if (a.hasOwnProperty(field)) {
-				var matches = a[field] == b[field] || (typeof a[field] === 'function' && a[field](b[field]))
+                var aIsNull = typeof a[field] === 'undefined' || a[field] === null
+				var matches = (aIsNull ? a[field] === b[field] : a[field] == b[field]) 
+                    || (typeof a[field] === 'function' && a[field](b[field]))
 				if (!matches){
                     if (logDebug){ console.log('Rejecting match on field=' + field + ' - ' + a[field] + ' != ' + b[field]) }
                     return false;
