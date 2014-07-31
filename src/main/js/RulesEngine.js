@@ -36,6 +36,10 @@ var RulesEngine = {
         return {
             evaluate: function(inputs){
                 var logDebug = console && thiz.debug
+                if (typeof inputs === 'undefined' || inputs == null){
+                    if (console){ console.error('Cannot evaluate null or undefined input!') }
+                    return
+                }
                 if (logDebug){ console.log('--- Evaluating inputs= '+thiz.objectToString(inputs)+' ---') }
                 for (var i = 0; i < rules.length; i++){
                     if (thiz.equals(rules[i].condition, inputs)){    // if we have a match
