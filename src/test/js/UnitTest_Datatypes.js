@@ -1,6 +1,6 @@
 /**
  *
- * These unit tests, test that valid datatypes are handled correctly.
+ * Test that all valid javascript datatypes are handled correctly.
  *
  */
 
@@ -39,7 +39,7 @@ var rules3 = [ /* Test wildcards */
   ['c1',            'c2',           'p_out1',       'p_out2'        ],
   // ---------------------------------------------------------------|
   ['string1',       'string2',      'aaa',          'bbb'           ],
-  [_RE.WC,          _RE.WC,         'WC1',          'WC2'           ], // Wildcard
+  [_re.all,         _re.all,        'WC1',          'WC2'           ], // Wildcard
 ]
 
 var thenOverride1 = function(a){ return 'one' }
@@ -52,13 +52,13 @@ var rules4 = [ /* Test override 'then' functions */
   ['two',       'param2',   thenOverride2],
 ]
 
-var engine1 = RulesEngine.build(rules1, defaultFunction)
-var engine2 = RulesEngine.build(rules2, defaultFunction)
-var engine3 = RulesEngine.build(rules3, defaultFunction)
+var engine1 = _re.build(rules1, defaultFunction)
+var engine2 = _re.build(rules2, defaultFunction)
+var engine3 = _re.build(rules3, defaultFunction)
 
 // test default and override "then" functions
-var engine4 = RulesEngine.build(rules4)
-var engine5 = RulesEngine.build(rules4, thenOverride1)
+var engine4 = _re.build(rules4)
+var engine5 = _re.build(rules4, thenOverride1)
 
 /* ====== End of setup ====== */
 
@@ -105,6 +105,17 @@ QUnit.test( "Objects that match (N.B. compare by reference, not deep comparison!
     assert.ok( engine1.evaluate({c1:obj1,c2:obj2}) == 'defaultFunction -> arguments: (out1=[object Object],out2=[object Object])' )
 });
 QUnit.test( "Objects that don't match", function( assert ) {
+    assert.ok( engine1.evaluate({c1:{a:1},c2:{b:2}}) == null ) // (not the same object references)
+});
+
+// Arrays
+QUnit.test( "Arrays that match", function( assert ) {
+    assert.ok( engine1.evaluate({c1:[1,2],c2:[3,4]}) == 'defaultFunction -> arguments: (out1=5,6,out2=7,8)' )
+});
+QUnit.test( "Arrays that match (and are out of order)", function( assert ) {
+    assert.ok( engine1.evaluate({c1:[2,1],c2:[4,3]}) == 'defaultFunction -> arguments: (out1=5,6,out2=7,8)' )
+});
+QUnit.test( "Arrays that don't match", function( assert ) {
     assert.ok( engine1.evaluate({c1:{a:1},c2:{b:2}}) == null ) // (not the same object references)
 });
 
