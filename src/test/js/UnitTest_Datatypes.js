@@ -13,8 +13,12 @@ var defaultFunction = function(){
 }
 
 var obj1 = {a:1}, obj2 = {b:2}, obj3 = {c:3}, obj4 = {d:4}
-var startsWithAA = function(a){return a.c1.toString().indexOf('AA') == 0}
-var startsWithBB = function(a){return a.c1.toString().indexOf('BB') == 0}
+var startsWithAA = function(a){
+    return a && a.indexOf && a.indexOf('AA') == 0
+}
+var startsWithBB = function(a){
+    return a && a.indexOf && a.indexOf('BB') == 0
+}
 
 var rules1 = [
   ['c1',        'c2',       'p_out1',   'p_out2'    ], // Controls / Parameters
@@ -24,7 +28,7 @@ var rules1 = [
   [true,        false,      true,       false       ], // Booleans
   [obj1,        obj2,       obj3,       obj4        ], // Objects
   [[1,2],       [3,4],      [5,6],      [7,8]       ], // Arrays
-  [startsWithAA,   startsWithBB,  startsWithAA,  startsWithBB   ], // Function
+  [startsWithAA,   startsWithBB,  startsWithAA,  startsWithBB   ], // Functions
   /*
   //[undefined,   undefined,  undefined,  undefined   ], // Undefined
   //[null,        null,       null,       null        ], // Null
@@ -35,7 +39,7 @@ var rules1 = [
 var prefix = '[engine1 w/ default function] - '
 var engine1 = RulesEngine.build(rules1, defaultFunction)
 
-/* --- Tests --- */
+/* --- Test Datatype Rule Matching --- */
 
 QUnit.test( prefix + "blank object (i.e. no matches)", function( assert ) {
     assert.ok( engine1.evaluate({}) == null )
@@ -75,12 +79,11 @@ QUnit.test( prefix + "Objects that don't match", function( assert ) {
     //_RE.debug = false
 });
 
-/*
 // Functions
 QUnit.test( prefix + "Functions that match", function( assert ) {
-    _RE.debug=true
-    assert.ok( engine1.evaluate({c1:'AA1',c2:'BB2'}) == 'defaultFunction -> arguments: (out1=[object Object],out2=[object Object])' )
-    _RE.debug=false
+    //_RE.debug=true
+    assert.ok( engine1.evaluate({c1:'AA1',c2:'BB2'}) == 'defaultFunction -> arguments: (out1=function,out2=function)' )
+    //_RE.debug=false
 });
 QUnit.test( prefix + "Functions that don't match", function( assert ) {
     assert.ok( engine1.evaluate({c1:'FOO',c2:'BAR'}) == null )
@@ -88,6 +91,16 @@ QUnit.test( prefix + "Functions that don't match", function( assert ) {
 
 //*/
 
+/* Check then function behaviour (and overriding) */
+
+
+/* Evaluate Tests - engine.evaluate(...) */
+
+// check undefined object doesn't throw exception
+// check null object doesn't throw exception
+// check blank object (i.e. {})  doesn't throw exception
+// check valid non-matching object doesn't match any rules
+// check valid matching object matches a rule
 
 
 

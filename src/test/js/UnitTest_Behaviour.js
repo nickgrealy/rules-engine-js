@@ -10,7 +10,10 @@
 // check one param constructor works - RulesEngine.build(rules)
 // check two param constructor works - RulesEngine.build(rules, defaultFunction)
 
-/* Evaluate Tests - engine.evaluate(...) */
+// check no conditions complains
+// check single condition works
+// check many conditions works
 
-// check single condition works properly
-// check many conditions works properly
+// check no params works
+// check single param works
+// check many params works

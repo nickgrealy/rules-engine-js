@@ -97,11 +97,11 @@ var RulesEngine = {
         var keys = this.getKeys(map)
         var string = '('
         if (keys.length > 0){
-            string += keys[0]+'='+map[keys[0]]
+            string += keys[0]+'='+ (typeof map[keys[0]] === 'function' ? 'function' : map[keys[0]])
         }
         if (keys.length > 1){
             for (var i = 1; i < keys.length; i++){
-                string += ','+keys[i]+'='+map[keys[i]]
+                string += ','+keys[i]+'='+(typeof map[keys[i]] === 'function' ? 'function' : map[keys[i]])
             }
         }
         string += ')'
@@ -122,7 +122,7 @@ var RulesEngine = {
         var thiz = this, logDebug = console && thiz.debug
         for (var field in a){
             if (a.hasOwnProperty(field)) {
-				var matches = a[field] == b[field]//(typeof expected === 'function' && expected(b[field])) || a[field] == b[field]
+				var matches = a[field] == b[field] || (typeof a[field] === 'function' && a[field](b[field]))
 				if (!matches){
                     if (logDebug){ console.log('Rejecting match on field=' + field + ' - ' + a[field] + ' != ' + b[field]) }
                     return false;
