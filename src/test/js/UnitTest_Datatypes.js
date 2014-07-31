@@ -31,13 +31,19 @@ var rules1 = [
   [startsWithAA,    startsWithBB,   startsWithAA,   startsWithBB    ], // Functions
   [undefined,       undefined,      undefined,      undefined       ], // Undefined
   [null,            null,           null,           null            ], // Null
-  //[_RE.WC,        _RE.WC,      _RE.WC,       _RE.WC       ], // Wildcard
 ]
 
 var rules2 = [
   ['c1',            'c2',           'p_out1',       'p_out2'        ], // Controls / Parameters
   // ---------------------------------------------------------------|
   ['string1',       'string2',      'aaa',          'bbb'           ], // Strings
+]
+
+var rules3 = [
+  ['c1',            'c2',           'p_out1',       'p_out2'        ], // Controls / Parameters
+  // ---------------------------------------------------------------|
+  ['string1',       'string2',      'aaa',          'bbb'           ], // Strings
+  [_RE.WC,          _RE.WC,         _RE.WC,         _RE.WC          ], // Wildcard
 ]
 
 var engine1 = RulesEngine.build(rules1, defaultFunction)
@@ -105,8 +111,6 @@ QUnit.test( "Functions that don't match", function( assert ) {
 
 // Wildcard
 
-
-QUnit.module( "--- Combination Datatypes ---" );
 
 QUnit.module( "--- Custom Then Function ---" );
 
