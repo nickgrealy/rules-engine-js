@@ -28,8 +28,15 @@ var rules22 = [ /* Combined datatypes */
   [true,    [4,3],  f2],
 ]
 
+var rules23 = [
+    ['one','two'    ],
+    ['aaa','bbb'    , function(){return 'matched1'}],
+    ['aaa',_re.all  , function(){return 'matched2'}]
+]
+
 var engine21 = _re.build(rules21, undefined, true) // rule matching / ordering
 var engine22 = _re.build(rules22) // combined datatypes
+var engine23 = _re.build(rules23) // test evaluate params
 
 // Setup end
 
@@ -78,4 +85,15 @@ QUnit.test( "all matching rules should match", function( assert ) {
     assert.ok( flagF2 == true )
     assert.ok( flagF3 == false )
     reset()
+});
+
+QUnit.module( "--- Test Multiple Params ---" );
+
+QUnit.test( "evaluate should only care about it's own parameters", function( assert ) {
+    assert.strictEqual( engine23.evaluate({one:'aaa',two:'bbb'}), 'matched1' )
+    assert.strictEqual( engine23.evaluate({one:'aaa',two:'ccc'}), 'matched2' )
+    assert.strictEqual( engine23.evaluate({one:'aaa'}), 'matched2' )
+    assert.strictEqual( engine23.evaluate({one:'aaa',three:'ddd'}), 'matched2' )
+    assert.strictEqual( engine23.evaluate({three:'ddd',one:'aaa'}), 'matched2' )
+    assert.strictEqual( engine23.evaluate({three:'ddd',four:'eee'}), null )
 });
