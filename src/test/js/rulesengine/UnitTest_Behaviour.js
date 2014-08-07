@@ -55,6 +55,14 @@ QUnit.test( "Boolean should fail", function( assert ) {
 });
 
 // validate row lengths
+QUnit.test( "header row must contain only strings", function( assert ) {
+    assert.throws(
+        function(){ _re.build([
+            ['one','p_one', undefined],
+        ]); },
+        function(err){ return err.toString() === 'Header row must only contain strings! headers=one,p_one,'}
+    )
+});
 QUnit.test( "check shorter rows throw exception", function( assert ) {
     assert.throws(
         function(){ _re.build([
@@ -79,7 +87,7 @@ QUnit.test( "check longer rows throw exception", function( assert ) {
 });
 QUnit.test( "check correct length row doesn't throw exception", function( assert ) {
     _re.build([
-        ['one','p_one',],
+        ['one','p_one'],
         ['one','p_one'],
         ['one','p_one',],
         ['one','p_one',function(){}]

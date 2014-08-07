@@ -50,24 +50,28 @@ var RulesEngine = {
     debug:      false,
 
     build: function(twoDimRulesArray, defaultFunction, multiMode){
-        var thiz = this, logDebug = console && thiz.debug
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
         if (logDebug){ console.log('=== Building Rules Engine ===') }
         multiMode = typeof multiMode === 'undefined' ? false : multiMode
         var rules = this.buildRules(twoDimRulesArray, defaultFunction)
         return {
             evaluate: function(inputs){
-                var logDebug = console && thiz.debug
+                var logDebug = typeof console !== 'undefined' && thiz.debug
                 if (typeof inputs === 'undefined' || inputs == null){
-                    if (console){ console.error('Cannot evaluate null or undefined input!') }
+                    if (logDebug){ console.error('Cannot evaluate null or undefined input!') }
                     return
                 }
                 if (logDebug){ console.log('--- Evaluating inputs= '+thiz.objectToString(inputs)+' ---') }
                 var returnResponse = null
                 for (var i = 0; i < rules.length; i++){
                     if (thiz.equals(rules[i].condition, inputs)){    // if we have a match
-						var response = rules[i].then(rules[i].params)
-						if (logDebug){ console.log('Found rule match: ' + rules[i].toString() + ' output:' + response) }
-                        returnResponse = response
+                        if (typeof rules[i].then !== 'undefined'){
+                            var response = rules[i].then(rules[i].params)
+                            if (logDebug){ console.log('Found rule match: ' + rules[i].toString() + ' output:' + response) }
+                            returnResponse = response
+                        } else {
+                            if (logDebug){ console.log('Cannot execute undefined function!') }
+                        }
                         if (!multiMode){
                             break
                         }
@@ -82,7 +86,7 @@ var RulesEngine = {
     },
 
     buildRules: function(twoDimensionalArray, defaultFunction){
-        var thiz = this, logDebug = console && thiz.debug
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
         var rules = []
         if (typeof twoDimensionalArray === 'undefined' || twoDimensionalArray == null || typeof twoDimensionalArray.length === 'undefined' || twoDimensionalArray.length == 0){
             throw 'twoDimensionalArray must be a two dimensional array!'
@@ -90,7 +94,9 @@ var RulesEngine = {
         var tmp = twoDimensionalArray[0] // first row is the list of fields
         var nonStrings = thiz.findAll(tmp, function(a){ return typeof a !== 'string' })
         if (nonStrings.length > 0){
-            throw 'Header row must only contain strings! headers=' + tmp.join(',')
+            var mesg = 'Header row must only contain strings! headers=' + tmp.join(',')
+            if (logDebug){ console.error(mesg) }
+            throw mesg
         }
         var fieldNames = thiz.findAll(tmp, function(a){ return a.indexOf && a.indexOf('p_') === -1 })
         var inputNames = thiz.collect(tmp, function(a){ if (a.indexOf && a.indexOf('p_') === 0){ return a.substring(2) } }) // this performance could be improved
@@ -99,22 +105,29 @@ var RulesEngine = {
 		}
         var expectedLength = fieldNames.length + inputNames.length
         for (var i = 1; i < twoDimensionalArray.length; i++){
-            var actualLen = twoDimensionalArray[i].length
-            if (actualLen != expectedLength && actualLen != expectedLength+1){
-                throw 'Expected length='+expectedLength+' but found length='+twoDimensionalArray[i].length+'! row#='+i
-            }
-            var tmp = this.buildRule(fieldNames, inputNames, twoDimensionalArray[i], defaultFunction)
-            if (logDebug){ console.log(tmp.toString()) }
-            if (typeof tmp !== 'undefined' && tmp !== null){
-                rules[rules.length] = tmp
+            if (typeof twoDimensionalArray[i] !== 'undefined'){
+                var actualLen = twoDimensionalArray[i].length
+                if (actualLen != expectedLength && actualLen != expectedLength+1){
+                    throw 'Expected length='+expectedLength+' but found length='+twoDimensionalArray[i].length+'! row#='+i
+                }
+                var tmp = this.buildRule(fieldNames, inputNames, twoDimensionalArray[i], defaultFunction)
+                if (logDebug){ console.log(tmp.toString()) }
+                if (typeof tmp !== 'undefined' && tmp !== null){
+                    rules[rules.length] = tmp
+                }
+            } else {
+                if (logDebug){ console.log('Rejecting undefined row: #' + i + ' headers=' + fieldNames.join(',')) }
             }
         }
         return rules
     },
 
     buildRule: function(fieldNames, inputNames, conditions, defaultCondition){
-        var thiz = this, logDebug = console && thiz.debug
-        defaultCondition = typeof defaultCondition === 'undefined' ? function(){} : defaultCondition
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
+        if (typeof defaultCondition === 'undefined'){
+            if (logDebug){ console.log('Found undefined defaultFunction, replacing with placeholder...') }
+            defaultCondition = function(){}
+        }
         if (typeof conditions !== 'undefined'){
             var fnlen = fieldNames.length, inlen = inputNames.length
             var conditionObject = {}
@@ -126,7 +139,7 @@ var RulesEngine = {
                 inputObject[inputNames[i]] = conditions[i + fnlen]
             }
             var thenCondition = defaultCondition
-            if ((fnlen + inlen) < conditions.length){
+            if ((fnlen + inlen) < conditions.length && typeof conditions[conditions.length-1] === 'function'){
                 thenCondition = conditions[conditions.length-1]
             }
             return {condition: conditionObject, params: inputObject, then: thenCondition, toString: function(){
@@ -136,7 +149,7 @@ var RulesEngine = {
     },
     
     objectToString: function(map){
-        var thiz = this, logDebug = console && thiz.debug
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
         var keys = this.getKeys(map)
         var string = '('
         if (keys.length > 0){
@@ -152,9 +165,13 @@ var RulesEngine = {
     },
     
     getKeys: function(obj){
-        var thiz = this, logDebug = console && thiz.debug
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
         var keys = []
-        for(var key in obj){ keys[keys.length] = key }
+        for(var key in obj){
+            if (obj.hasOwnProperty(key)) {
+                keys[keys.length] = key
+            }
+        }
         return keys
     },
     
@@ -162,27 +179,31 @@ var RulesEngine = {
 
     /* does a deep match, of 1st level fields, of an object */
     equals: function(a, b){
-        var thiz = this, logDebug = console && thiz.debug
-        for (var field in a){
-            if (a.hasOwnProperty(field)) {
-                // check if a is null or undefined, if so, compare using ===
-                var aIsNull = typeof a[field] === 'undefined' || a[field] === null
-                // check if the objects match
-				var matches = (aIsNull ? a[field] === b[field] : a[field] == b[field]) 
-                    || (typeof a[field] === 'function' && a[field](b[field]))   // function
-                    || (a[field] instanceof Array && b[field] instanceof Array && a[field].compare(b[field]).equal)   // array
-				if (!matches){
-                    if (logDebug){ console.log('Rejecting match on field=' + field + ' - ' + a[field] + ' != ' + b[field]) }
-                    return false;
-                }
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
+        var keys = thiz.getKeys(a)
+        if (logDebug){ console.log('Checking keys: ' + keys.join(',')) }
+        for (var i = 0; i < keys.length; i++){
+            var field = keys[i]
+            // check if a is null or undefined, if so, compare using ===
+            var aIsNull = typeof a[field] === 'undefined' || a[field] === null
+            // check if the objects match
+            var matches = (aIsNull ? a[field] === b[field] : a[field] == b[field]) 
+                || (typeof a[field] === 'function' && a[field](b[field]))   // function
+                || (a[field] instanceof Array && b[field] instanceof Array && a[field].compare(b[field]).equal)   // array
+            if (!matches){
+                if (logDebug){ console.log('Rejecting match on field [rule, actual] -> ' + field + ' [' + a[field] + ' != ' + b[field] + ']') }
+                return false;
+            } else {
+                if (logDebug){ console.log('Found match on field [rule, actual] -> ' + field + ' [' + a[field] + ' == ' + b[field] + ']') }
             }
         }
+        // everything matches, return true!
         return true;
     },
     
     /* finds all matches - see groovy! */ 
     findAll: function(list, closure){
-        var thiz = this, logDebug = console && thiz.debug
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
         var tmp=[], clos = closure;
         if (typeof list === 'undefined' || list == null){
             return tmp
@@ -197,7 +218,7 @@ var RulesEngine = {
     
     /* collects all non-undefined objects */ 
     collect: function(list, closure){
-        var thiz = this, logDebug = console && thiz.debug
+        var thiz = this, logDebug = typeof console !== 'undefined' && thiz.debug
         var tmp=[], clos = closure;
         if (typeof list === 'undefined' || list == null){
             return tmp

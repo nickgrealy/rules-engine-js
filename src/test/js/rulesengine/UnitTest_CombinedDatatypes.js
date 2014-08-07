@@ -14,7 +14,7 @@ function reset(){ flagF1 = false; flagF2 = false; flagF3 = false}
 reset()
 
 var rules21 = [ /* Rule matching / ordering */
-  ['c1',    'c2',   ],
+  ['c1',    'c2'   ],
   // ---------------|
   ['AA',    _re.all,    f1],
   [_re.all, _re.all,    f2],
@@ -22,10 +22,10 @@ var rules21 = [ /* Rule matching / ordering */
 ]
 
 var rules22 = [ /* Combined datatypes */
-  ['c1',    'c2',   ],
+  ['c1',    'c2'   ],
   // ---------------|
   ['AA',    111,    f1],
-  [true,    [4,3],  f2],
+  [true,    222,  f2],
 ]
 
 var rules23 = [
@@ -44,46 +44,37 @@ var engine23 = _re.build(rules23) // test evaluate params
 QUnit.module( "--- Single Rule Matching (and multi data types) ---" );
 
 QUnit.test( "only first matching rule should match", function( assert ) {
-    assert.ok( engine22.evaluate({c1:'AA',c2:111}) == 'f1' )
-    assert.ok( flagF1 == true )
-    assert.ok( flagF2 == false )
+    assert.strictEqual( engine22.evaluate({c1:'AA',c2:111}), 'f1' )
+    assert.strictEqual( flagF1, true )
+    assert.strictEqual( flagF2, false )
     reset()
-    assert.ok( engine22.evaluate({c1:'AA',c2:'111'}) == 'f1' )
-    assert.ok( flagF1 == true )
-    assert.ok( flagF2 == false )
+    assert.strictEqual( engine22.evaluate({c1:'AA',c2:'111'}), 'f1' )
+    assert.strictEqual( flagF1, true )
+    assert.strictEqual( flagF2, false )
     reset()
-    assert.ok( engine22.evaluate({c1:true,c2:[3,4]}) == 'f2' )
-    assert.ok( flagF1 ==  false)
-    assert.ok( flagF2 == true )
-    reset()
-    assert.ok( engine22.evaluate({c1:true,c2:[4,3]}) == 'f2' )
-    assert.ok( flagF1 ==  false)
-    assert.ok( flagF2 == true )
+    assert.strictEqual( engine22.evaluate({c1:true,c2:222}), 'f2' )
+    assert.strictEqual( flagF1,  false)
+    assert.strictEqual( flagF2, true )
     reset()
 });
 
 QUnit.module( "--- Multi Rule Matching ---" );
 
 QUnit.test( "all matching rules should match", function( assert ) {
-    assert.ok( engine21.evaluate({c1:'AA',c2:111}) == 'f2' )
-    assert.ok( flagF1 == true )
-    assert.ok( flagF2 == true )
-    assert.ok( flagF3 == false )
+    assert.strictEqual( engine21.evaluate({c1:'AA',c2:111}), 'f2' )
+    assert.strictEqual( flagF1, true )
+    assert.strictEqual( flagF2, true )
+    assert.strictEqual( flagF3, false )
     reset()
-    assert.ok( engine21.evaluate({c1:'AA',c2:'111'}) == 'f2' )
-    assert.ok( flagF1 == true )
-    assert.ok( flagF2 == true )
-    assert.ok( flagF3 == false )
+    assert.strictEqual( engine21.evaluate({c1:'AA',c2:'111'}), 'f2' )
+    assert.strictEqual( flagF1, true )
+    assert.strictEqual( flagF2, true )
+    assert.strictEqual( flagF3, false )
     reset()
-    assert.ok( engine21.evaluate({c1:true,c2:[3,4]}) == 'f2' )
-    assert.ok( flagF1 == false)
-    assert.ok( flagF2 == true )
-    assert.ok( flagF3 == false )
-    reset()
-    assert.ok( engine21.evaluate({c1:true,c2:[4,3]}) == 'f2' )
-    assert.ok( flagF1 == false)
-    assert.ok( flagF2 == true )
-    assert.ok( flagF3 == false )
+    assert.strictEqual( engine21.evaluate({c1:true,c2:222}), 'f2' )
+    assert.strictEqual( flagF1, false)
+    assert.strictEqual( flagF2, true )
+    assert.strictEqual( flagF3, false )
     reset()
 });
 
