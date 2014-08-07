@@ -109,11 +109,9 @@ QUnit.test( "Objects that don't match", function( assert ) {
 });
 
 // Arrays
-/* TODO: Fix failing test in IE8 - Died on test #1 undefined: Object doesn't support this property or method */
 QUnit.test( "Arrays that match", function( assert ) {
     assert.strictEqual( engine1.evaluate({c1:[1,2],c2:[3,4]}), 'defaultFunction -> arguments: (out1=5,6,out2=7,8)' )
 });
-/* TODO: Fix failing test in IE8 - Died on test #1 undefined: Object doesn't support this property or method */
 QUnit.test( "Arrays that match (and are out of order)", function( assert ) {
     assert.strictEqual( engine1.evaluate({c1:[2,1],c2:[4,3]}), 'defaultFunction -> arguments: (out1=5,6,out2=7,8)' )
 });
@@ -137,7 +135,7 @@ QUnit.test( "Undefined that don't match", function( assert ) {
     assert.strictEqual( engine1.evaluate({c2:'BAR'}), null )
 });
 
-// Null */
+// Null
 QUnit.test( "Null that match", function( assert ) {
     assert.strictEqual( engine1.evaluate({c1:null,c2:null}), 'defaultFunction -> arguments: (out1=null,out2=null)' )
 });
@@ -165,6 +163,5 @@ QUnit.test( "Default, no override", function( assert ) {
 QUnit.test( "Default w/ override", function( assert ) {
     assert.strictEqual( engine5.evaluate({scenario:'two'}), 'two' )
 });
-
 
 

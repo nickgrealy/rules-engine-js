@@ -23,13 +23,20 @@ var result = engine.evaluate({outcome: 'Review Held', documentToProduce: 'ROA Sh
 // result = 1
 
  */
-
+if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function(obj, start) {
+         for (var i = (start || 0), j = this.length; i < j; i++) {
+             if (this[i] === obj) { return i; }
+         }
+         return -1;
+    }
+}
 if (!Array.prototype.compare){
     Array.prototype.compare = function(array2) {
         var inter = []
-        var tmp1 = this.slice()
-        var tmp2 = array2.slice()
-        for (var i = this.length-1; i > -1; i--){
+        var tmp1 = this.slice(0)
+        var tmp2 = array2.slice(0)
+        for (var i = tmp1.length-1; i > -1; i--){
             var idx = tmp2.indexOf(this[i])
             // destructive, only count matches once
             if (idx > -1){
