@@ -73,6 +73,7 @@ var RulesEngine = {
                 for (var i = 0; i < rules.length; i++){
                     if (thiz.equals(rules[i].condition, inputs)){    // if we have a match
                         if (typeof rules[i].then !== 'undefined'){
+                            if (console){ console.log('Matched rule #' + i + ' - inputs=' + thiz.objectToString(inputs)) }
                             var response = rules[i].then(rules[i].params)
                             if (logDebug){ console.log('Found rule match: ' + rules[i].toString() + ' output:' + response) }
                             returnResponse = response
@@ -85,7 +86,7 @@ var RulesEngine = {
                     }
                 }
                 if (returnResponse == null){
-                    if (logDebug){ console.log('Response was null for inputs: ' + thiz.objectToString(inputs)) }
+                    if (console){ console.log('No rule matched - inputs=' + thiz.objectToString(inputs)) }
                 }
                 return returnResponse
             }
