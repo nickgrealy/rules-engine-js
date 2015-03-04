@@ -1,4 +1,4 @@
-# RulesEngineJS
+# RulesEngine
 
 A Javascript Rules Engine
 
