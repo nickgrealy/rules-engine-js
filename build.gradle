@@ -1,0 +1,40 @@
+plugins {
+  id "com.eriwen.gradle.js" version "1.12.1"
+}
+
+defaultTasks 'clean', 'gzipJs'
+
+ext {
+	jsSrcDir = 'src/main/js'
+	jsDistDir = 'src/dist/js'
+	jsDistPrefix = 'RulesEngine-dist'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2'
+}
+
+task clean << {
+	ant.delete(dir: jsDistDir)
+}
+
+combineJs {
+    source = fileTree(jsSrcDir).include('**/*.js')
+    dest = file("${jsDistDir}/${jsDistPrefix}.js")
+}
+
+minifyJs {
+    source = combineJs
+    dest = file("${jsDistDir}/${jsDistPrefix}.min.js")
+    closure {
+        warningLevel = 'QUIET'
+    }
+}
+
+gzipJs {
+    source = minifyJs
+    dest = file("${jsDistDir}/${jsDistPrefix}.min.gz.js")
+}
+
+minifyJs.dependsOn combineJs
+gzipJs.dependsOn minifyJs
