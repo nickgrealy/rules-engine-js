@@ -2,6 +2,10 @@
 
 A Javascript Rules Engine
 
+## Example Usage
+
+- [Simple Example](http://jsfiddle.net/nickg1/mjahomzu/)
+
 ## TODO
 
 - Test performance
