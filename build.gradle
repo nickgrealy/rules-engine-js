@@ -1,13 +1,28 @@
+
 plugins {
   id "com.eriwen.gradle.js" version "1.12.1"
 }
 
-defaultTasks 'clean', 'gzipJs'
+repositories {
+    mavenCentral()
+}
+
+defaultTasks 'clean', 'gzipJs', 'jshint', 'jsdoc'
 
 ext {
 	jsSrcDir = 'src/main/js'
 	jsDistDir = 'src/dist/js'
+	jsDocsDir = "${projectDir}/docs"
 	jsDistPrefix = 'RulesEngine-dist'
+}
+
+javascript.source {
+    prod {
+        js {
+            srcDir file(jsSrcDir)
+            include "*.js"
+        }
+    }
 }
 
 task wrapper(type: Wrapper) {
@@ -15,11 +30,13 @@ task wrapper(type: Wrapper) {
 }
 
 task clean << {
+	ant.delete(dir: buildDir)
 	ant.delete(dir: jsDistDir)
+	ant.delete(dir: jsDocsDir)
 }
 
 combineJs {
-    source = fileTree(jsSrcDir).include('**/*.js')
+    source = javascript.source.prod.js.files
     dest = file("${jsDistDir}/${jsDistPrefix}.js")
 }
 
@@ -36,5 +53,12 @@ gzipJs {
     dest = file("${jsDistDir}/${jsDistPrefix}.min.gz.js")
 }
 
-minifyJs.dependsOn combineJs
-gzipJs.dependsOn minifyJs
+jshint {
+    tasks.jshint.source = javascript.source.prod.js.files
+    tasks.jshint.dest = file("${buildDir}/jshint.out")
+}
+
+jsdoc {
+    tasks.jsdoc.source = javascript.source.prod.js.files
+    tasks.jsdoc.destinationDir = file(jsDocsDir)
+}
