@@ -6,23 +6,29 @@ Author: Nick Grealy
 Date: 04/07/2014
 
  */
-var isUndef    = function(object){ return typeof object === 'undefined'; };
-var isNotUndef = function(object){ return typeof object !== 'undefined'; };
-var isFn       = function(object){ return typeof object === 'function';  };
+var RulesEngine = (function(thiz, Common){
+    if (typeof Common === 'undefined'){
+        throw '"Common" library is not loaded!'
+    }
+    
+    var isUndef    = Common.isUndef;
+    var isNotUndef = Common.isNotUndef;
+    var isFn       = Common.isFn;
+    var objectToString = Common.objectToString;
 
-var RulesEngine = {
+	thiz.version  = '1.0.2';
+	thiz.wildcard = function(){return true;};
+	thiz.all      = function(){return true;};
+	thiz.debug    = false;
+    
+    /* -- N.B. These below methods should be in a common library. -- */
 
-	version  : '1.0.2',
-	wildcard : function(){return true;},
-	all      : function(){return true;},
-	debug    : false,
-
-    buildEngine: function(inputsMap){
+    thiz.buildEngine = function(inputsMap){
 		return this.build(inputsMap.rules, inputsMap.defaultFn, inputsMap.multiMode);
-	},
+	};
 	
-    build: function(twoDimRulesArray, defaultFunction, multiMode){
-        var thiz = this, logDebug = isNotUndef(console) && thiz.debug;
+    thiz.build = function(twoDimRulesArray, defaultFunction, multiMode){
+        var logDebug = isNotUndef(console) && thiz.debug;
         if (logDebug){ console.log('-> === Building Rules Engine ==='); }
         multiMode = isUndef(multiMode) ? false : multiMode;
         var rules = this.buildRules(twoDimRulesArray, defaultFunction);
@@ -35,7 +41,7 @@ var RulesEngine = {
                     if (isNotUndef(console)){ console.error('-> Cannot evaluate null or undefined input!'); }
                     return;
                 }
-                if (logDebug){ console.log('-> Evaluating inputs= '+thiz.objectToString(inputs)+' ---'); }
+                if (logDebug){ console.log('-> Evaluating inputs= '+objectToString(inputs)+' ---'); }
                 var returnResponse = null;
 				var ruleMatched = false;
                 for (var i = 0; i < rules.length; i++){
@@ -43,7 +49,7 @@ var RulesEngine = {
                     if (thiz.equals(rule.condition, inputs)){    // if we have a match
 						ruleMatched = true;
                         if (isNotUndef(rule.then)){
-                            if (isNotUndef(console)){ console.log('-> Matched rule #' + i + ' - inputs=' + thiz.objectToString(inputs)); }
+                            if (isNotUndef(console)){ console.log('-> Matched rule #' + i + ' - inputs=' + objectToString(inputs)); }
                             var response = rule.then(rule.params, inputs);
                             if (logDebug){ console.log('-> Found rule match: ' + rule.toString() + ' output:' + response); }
                             returnResponse = response;
@@ -56,15 +62,15 @@ var RulesEngine = {
                     }
                 }
                 if (!ruleMatched){
-                    if (isNotUndef(console)){ console.log('-> No rule matched - inputs=' + thiz.objectToString(inputs)); }
+                    if (isNotUndef(console)){ console.log('-> No rule matched - inputs=' + objectToString(inputs)); }
                 }
                 return returnResponse;
             }
         };
-    },
+    };
 
-    buildRules: function(twoDimensionalArray, defaultFunction){
-        var thiz = this, logDebug = isNotUndef(console) && thiz.debug;
+    thiz.buildRules = function(twoDimensionalArray, defaultFunction){
+        var logDebug = isNotUndef(console) && thiz.debug;
         var rules = [];
         if (isUndef(twoDimensionalArray) || twoDimensionalArray == null || isUndef(twoDimensionalArray.length) || twoDimensionalArray.length === 0){
             throw 'twoDimensionalArray must be a two dimensional array!';
@@ -99,10 +105,10 @@ var RulesEngine = {
             }
         }
         return rules;
-    },
+    };
 
-    buildRule: function(fieldNames, inputNames, conditions, defaultCondition){
-        var thiz = this, logDebug = isNotUndef(console) && thiz.debug;
+    thiz.buildRule = function(fieldNames, inputNames, conditions, defaultCondition){
+        var logDebug = isNotUndef(console) && thiz.debug;
         if (isUndef(defaultCondition)){
             if (logDebug){ console.log('-> Found undefined defaultFunction, replacing with placeholder...'); }
             defaultCondition = function(){};
@@ -122,25 +128,17 @@ var RulesEngine = {
 				if (logDebug){ console.log("-> Using override function."); }
             } else {
                 thenCondition = defaultCondition;
-				if (logDebug){ console.log("-> Using default function - check1=" + thiz.objectToString(conditions)); }
+				if (logDebug){ console.log("-> Using default function - check1=" + objectToString(conditions)); }
 			}
             return {condition: conditionObject, params: inputObject, then: thenCondition, toString: function(){
-                return "Rule={ conditions: " + thiz.objectToString(conditionObject) + ", params: " + thiz.objectToString(inputObject) + ", then: "+ typeof thenCondition+" }";
+                return "Rule={ conditions: " + objectToString(conditionObject) + ", params: " + objectToString(inputObject) + ", then: "+ typeof thenCondition+" }";
             }};
         }
-    },
-    
-    /* -- N.B. These below methods should be in a common library. -- */
-    
-    objectToString: function(object){
-        return "("+Object.keys(object).map(
-            function(key){ return key+"="+(isFn(object[key]) ? 'function' : object[key]); }
-            ).join(",")+")";
-    },
+    };
 
     /* does a deep match, of 1st level fields, of an object */
-    equals: function(a, b){
-        var thiz = this, logDebug = isNotUndef(console) && thiz.debug;
+    thiz.equals = function(a, b){
+        var logDebug = isNotUndef(console) && thiz.debug;
         var keys = Object.keys(a);
         if (logDebug){ console.log('-> Checking keys: ' + keys.join(',')); }
         for (var i = 0; i < keys.length; i++){
@@ -157,8 +155,10 @@ var RulesEngine = {
             }
         }
         // everything matches, return true!
-        return true
-    }
+        return true;
+    };
     
-};
+    return thiz;
+    
+}(RulesEngine || {}, Common));
 var _re = RulesEngine;

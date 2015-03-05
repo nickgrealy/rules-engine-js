@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Example</title>
+  <!-- javascript -->
+  <script src="../../../main/js/polyfill.js"></script>
+  <script src="../../../main/js/Common.js"></script>
+  <script src="../../../main/js/RulesEngine.js"></script>
+  <style>
+    body{font-family:verdana;}
+    #dogSection,#catSection,#cowSection{margin:10px 0px;display:none;padding:4px;}
+    #dogSection{border:1px solid brown;}
+    #catSection{border:1px solid black;}
+    #cowSection{border:1px dashed black;}
+  </style>
+  <script>
+// function which takes a map of parameters, to their show/hide value
+// e.g. inputs = {p_dogSection: 'show', p_catSection: 'hide'}
+var showHideFn = function(inputs){
+    Common.forEach(Object.keys(inputs), function(key, i){
+        var disp = inputs[key] == 'show' ? 'block' : 'none'
+        document.getElementById(key).style.display = disp
+    })
+}
+
+// the rules to evaluate against
+var rules = [
+    ['control1', 'p_dogSection', 'p_catSection', 'p_cowSection'],
+    [''        , 'hide'        , 'hide'        , 'hide'        ],
+    ['catdog'  , 'show'        , 'show'        , 'hide'        ],
+    ['dogcow'  , 'show'        , 'hide'        , 'show'        ],
+    ['cowcat'  , 'hide'        , 'show'        , 'show'        ]
+]
+
+// the rules engine, which will evaluate the rules
+var rulesEngine = RulesEngine.build(rules, showHideFn, false)
+
+// add onchange event to the select control, re-evaluate the rules engine onchange
+window.evaluate = function(select){
+    var selectedValue = select.options[select.selectedIndex].value
+    var rulesControls = {control1: selectedValue}
+    rulesEngine.evaluate(rulesControls)
+}
+
+  </script>
+</head>
+<body>
+    <label>Animal:</label>
+    <select id="control1" size="4" onchange="window.evaluate(this)" >
+        <option value="">-- Please Select --</option>
+        <option value="catdog">cat & dog</option>
+        <option value="dogcow">dog & cow</option>
+        <option value="cowcat">cow & cat</option>
+    </select>
+    <div id="dogSection">dog!</div>
+    <div id="catSection">cat!</div>
+    <div id="cowSection">cow!</div>
+</body>
+</html>

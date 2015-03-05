@@ -7,9 +7,9 @@
 /* ====== Start Setup ====== */
 
 var defaultFunction = function(){
-    var args = Array.prototype.slice.call(arguments)
-	var response = 'defaultFunction -> arguments: ' + RulesEngine.objectToString(args[0])
-    return response
+    var args = Array.prototype.slice.call(arguments);
+	var response = 'defaultFunction -> arguments: ' + Common.objectToString(args[0]);
+    return response;
 }
 
 var obj1 = {a:1}, obj2 = {b:2}, obj3 = {c:3}, obj4 = {d:4}

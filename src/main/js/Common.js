@@ -13,7 +13,7 @@ var Common = (function(thiz){
     thiz.isUndef = function(obj){ return typeof obj === 'undefined'; };
   
     /** Returns true if the given object is not undefined. */
-    thiz.isUndef = function(obj){ return typeof obj !== 'undefined'; };
+    thiz.isNotUndef = function(obj){ return typeof obj !== 'undefined'; };
   
     /** Returns true if the given object is a function. */
     thiz.isFn = function(obj){ return typeof obj === 'function'; };
@@ -85,6 +85,13 @@ var Common = (function(thiz){
             */
         return map;
     };
+    
+    var objectToString = function(object){
+        return "("+Object.keys(object).map(
+            function(key){ return key+"="+(thiz.isFn(object[key]) ? 'function' : object[key]); }
+            ).join(",")+")";
+    };
+    
     return thiz;
   
 }(Common || {}));

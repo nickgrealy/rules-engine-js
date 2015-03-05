@@ -5,6 +5,7 @@
   <title>Example</title>
   <!-- javascript -->
   <script src="../../../main/js/polyfill.js"></script>
+  <script src="../../../main/js/Common.js"></script>
   <script src="../../../main/js/RulesEngine.js"></script>
   <style>
     body{font-family:verdana;}
@@ -17,7 +18,7 @@
 // function which takes a map of parameters, to their show/hide value
 // e.g. inputs = {p_dogSection: 'show', p_catSection: 'hide'}
 var showHideFn = function(inputs){
-    Object.keys(inputs).forEach(function(key, i){
+    Common.forEach(Object.keys(inputs), function(key, i){
         var disp = inputs[key] == 'show' ? 'block' : 'none'
         document.getElementById(key).style.display = disp
     })
