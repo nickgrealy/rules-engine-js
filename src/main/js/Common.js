@@ -86,10 +86,33 @@ var Common = (function(thiz){
         return map;
     };
     
-    var objectToString = function(object){
+	/** Converts an object to a JSON-like string. */
+    thiz.objectToString = function(object){
         return "("+Object.keys(object).map(
             function(key){ return key+"="+(thiz.isFn(object[key]) ? 'function' : object[key]); }
             ).join(",")+")";
+    };
+	
+    /** does a deep match, of 1st level fields, of an object */
+    thiz.equals = function(a, b){
+        var logDebug = thiz.isNotUndef(console) && thiz.debug;
+        var keys = Object.keys(a);
+        if (logDebug){ console.log('-> Checking keys: ' + keys.join(',')); }
+        for (var i = 0; i < keys.length; i++){
+            var field = keys[i];
+            // check if a is null or undefined, if so, compare using ===
+            var aIsNull = thiz.isUndef(a[field]) || a[field] === null;
+            // check if the objects match
+            var matches = (aIsNull ? a[field] === b[field] : a[field] == b[field]) || (thiz.isFn(a[field]) && a[field](b[field])) || (a[field] instanceof Array && b[field] instanceof Array && a[field].compare(b[field]).equal);   // array
+            if (!matches){
+                if (logDebug){ console.log('-> Rejecting match on field [rule, actual] -> ' + field + ' [' + a[field] + ' != ' + b[field] + ']'); }
+                return false;
+            } else {
+                if (logDebug){ console.log('-> Found match on field [rule, actual] -> ' + field + ' [' + a[field] + ' == ' + b[field] + ']'); }
+            }
+        }
+        // everything matches, return true!
+        return true;
     };
     
     return thiz;
