@@ -1,29 +1,25 @@
+// requires Common.js
+
 /**
-
-Standalone implementation of a rules engine.
-
-Author: Nick Grealy
-Date: 04/07/2014
-
+ * Standalone implementation of a rules engine.
  */
 var RulesEngine = (function(thiz, Common){
+    
     if (typeof Common === 'undefined'){
-        throw '"Common" library is not loaded!'
+        throw 'The "Common" library is not loaded!'
     }
 
 	thiz.version  = '1.0.2';
 	thiz.wildcard = function(){return true;};
 	thiz.all      = function(){return true;};
 	thiz.debug    = false;
-    
-    /* -- N.B. These below methods should be in a common library. -- */
 
     thiz.buildEngine = function(inputsMap){
 		return this.build(inputsMap.rules, inputsMap.defaultFn, inputsMap.multiMode);
 	};
 	
     thiz.build = function(twoDimRulesArray, defaultFunction, multiMode){
-        var thizz = this, logDebug = Common.isNotUndef(console) && thiz.debug;
+        var thizz = this, logDebug = Common.isDef(console) && thiz.debug;
         if (logDebug){ console.log('-> === Building Rules Engine ==='); }
         multiMode = Common.isUndef(multiMode) ? false : multiMode;
         var rules = this.buildRules(twoDimRulesArray, defaultFunction);
@@ -31,9 +27,9 @@ var RulesEngine = (function(thiz, Common){
 			version: thiz.version,
 			privRules: rules,
             evaluate: function(inputs){
-                var logDebug = Common.isNotUndef(console) && thiz.debug;
+                var logDebug = Common.isDef(console) && thiz.debug;
                 if (Common.isUndef(inputs) || inputs == null){
-                    if (Common.isNotUndef(console)){ console.error('-> Cannot evaluate null or undefined input!'); }
+                    if (Common.isDef(console)){ console.error('-> Cannot evaluate null or undefined input!'); }
                     return;
                 }
                 if (logDebug){ console.log('-> Evaluating inputs= '+Common.objectToString(inputs)+' ---'); }
@@ -41,10 +37,10 @@ var RulesEngine = (function(thiz, Common){
 				var ruleMatched = false;
                 for (var i = 0; i < rules.length; i++){
                     var rule = rules[i];
-                    if (Common.equals(rule.condition, inputs)){    // if we have a match
+                    if (Common.equals(rule.condition, inputs)){ // if we have a match
 						ruleMatched = true;
-                        if (Common.isNotUndef(rule.then)){
-                            if (Common.isNotUndef(console)){
+                        if (Common.isDef(rule.then)){
+                            if (Common.isDef(console)){
 								console.log('-> Matched rule #' + i + ' - inputs=' + Common.objectToString(inputs));
 							}
                             var response = rule.then(rule.params, inputs);
@@ -59,7 +55,7 @@ var RulesEngine = (function(thiz, Common){
                     }
                 }
                 if (!ruleMatched){
-                    if (Common.isNotUndef(console)){ console.log('-> No rule matched - inputs=' + Common.objectToString(inputs)); }
+                    if (Common.isDef(console)){ console.log('-> No rule matched - inputs=' + Common.objectToString(inputs)); }
                 }
                 return returnResponse;
             }
@@ -67,7 +63,7 @@ var RulesEngine = (function(thiz, Common){
     };
 
     thiz.buildRules = function(twoDimensionalArray, defaultFunction){
-        var logDebug = Common.isNotUndef(console) && thiz.debug;
+        var logDebug = Common.isDef(console) && thiz.debug;
         var rules = [];
         if (Common.isUndef(twoDimensionalArray) || twoDimensionalArray == null || Common.isUndef(twoDimensionalArray.length) || twoDimensionalArray.length === 0){
             throw 'twoDimensionalArray must be a two dimensional array!';
@@ -80,21 +76,21 @@ var RulesEngine = (function(thiz, Common){
             throw mesg;
         }
         var fieldNames = headers.filter(function(a){ return a.indexOf && a.indexOf('p_') === -1; });
-        var inputNames = headers.map(function(a){ if (a.indexOf && a.indexOf('p_') === 0){ return a.substring(2); } }).filter(Common.isNotUndef); // this performance could be improved
+        var inputNames = headers.map(function(a){ if (a.indexOf && a.indexOf('p_') === 0){ return a.substring(2); } }).filter(Common.isDef); // this performance could be improved
 		if (fieldNames.length === 0){
 			throw 'Could not find any field names! headerRow=' + headers.join(',');
 		}
         var expectedLength = fieldNames.length + inputNames.length;
         for (var i = 1; i < twoDimensionalArray.length; i++){
             var row = twoDimensionalArray[i];
-            if (Common.isNotUndef(row)){
+            if (Common.isDef(row)){
                 var actualLen = row.length;
                 if (actualLen != expectedLength && actualLen != expectedLength+1){
                     throw 'Expected length='+expectedLength+' but found length='+row.length+'! row#='+i;
                 }
                 var rule = this.buildRule(fieldNames, inputNames, row, defaultFunction);
                 if (logDebug){ console.log(rule.toString()); }
-                if (Common.isNotUndef(rule) && rule !== null){
+                if (Common.isDef(rule) && rule !== null){
                     rules[rules.length] = rule;
                 }
             } else {
@@ -105,12 +101,12 @@ var RulesEngine = (function(thiz, Common){
     };
 
     thiz.buildRule = function(fieldNames, inputNames, conditions, defaultCondition){
-        var logDebug = Common.isNotUndef(console) && thiz.debug;
+        var logDebug = Common.isDef(console) && thiz.debug;
         if (Common.isUndef(defaultCondition)){
             if (logDebug){ console.log('-> Found undefined defaultFunction, replacing with placeholder...'); }
             defaultCondition = function(){};
         }
-        if (Common.isNotUndef(conditions)){
+        if (Common.isDef(conditions)){
             // build condition and input objects
             var fnlen = fieldNames.length;
             var inlen = inputNames.length;

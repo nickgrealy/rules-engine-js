@@ -20,7 +20,7 @@ javascript.source {
     prod {
         js {
             srcDir file(jsSrcDir)
-            include "*.js"
+            include "polyfill.js,Common.js,RulesEngine.js"
         }
     }
 }
