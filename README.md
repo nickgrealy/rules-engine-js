@@ -19,3 +19,6 @@ Add functions to programatically:
 - add onchange/blur listeners
 - retrieve values from form types
 - perform cardinality, visibility, list values, default value, hint text, validation, focus or rules evaluation, set/clear value
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/nickgrealy/rulesenginejs/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
