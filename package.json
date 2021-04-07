@@ -1,0 +1,104 @@
+{
+  "name": "@mountainpass/rules-engine-js",
+  "version": "1.0.3",
+  "description": "Provides a javascript library for creating and executing decision tables.",
+  "author": "Nick Grealy <nickgrealy@gmail.com>",
+  "contributors": [
+    "Mountain Pass <info@mountain-pass.com.au>",
+    "Nick Grealy <nick@mountain-pass.com.au>"
+  ],
+  "keywords": [
+    "react",
+    "reactjs",
+    "infinity",
+    "infinite",
+    "scroll",
+    "scroller",
+    "visibility",
+    "intersection",
+    "observer",
+    "list",
+    "loader"
+  ],
+  "license": "Apache-2.0",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mountain-pass/rules-engine-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mountain-pass/rules-engine-js/issues"
+  },
+  "homepage": "https://mountain-pass.github.io/rules-engine-js/",
+  "main": "dist/index.js",
+  "module": "dist/index.modern.js",
+  "source": "src/index.ts",
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "build": "run-s build:npm",
+    "xxxbuild": "run-s build:npm build:site",
+    "build:npm": "microbundle-crl --format modern,cjs",
+    "xxxbuild:site": "cd example && yarn install && yarn run build",
+    "start": "microbundle-crl watch --no-compress --format modern,cjs",
+    "prepare": "run-s build",
+    "test": "export LOG_LEVEL=info && nyc --reporter=lcov mocha --timeout 10000 --recursive -r ts-node/register src/**/*.test.ts",
+    "test-watch": "export LOG_LEVEL=debug && ./node_modules/.bin/nodemon -e ts --watch test --watch src --exec 'nyc --reporter=lcov mocha --bail --timeout 10000 --recursive -r ts-node/register src/**/*.test.ts' ",
+    "test-wip": "export LOG_LEVEL=debug && ./node_modules/.bin/nodemon -e ts --watch test --watch src --exec 'nyc --reporter=lcov mocha --bail --timeout 10000 --recursive --grep wip -r ts-node/register src/**/*.test.ts' ",
+    "test:show-coverage": "nyc mocha --timeout 10000 --recursive",
+    "testx": "run-s test:unit test:lint test:build",
+    "test:build": "run-s build",
+    "test:lint": "eslint .",
+    "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
+    "test:watch": "react-scripts test --env=jsdom",
+    "version-bump": "npm version patch && git push && git push --tags",
+    "xxxpublish:site": "npm run build:site && gh-pages -d ./build",
+    "publish:npm": "npm publish --access public",
+    "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "pretty-quick": "pretty-quick --staged",
+    "npm-check": "npm-check --production",
+    "precommit": "yarn run pretty-quick && yarn run npm-check"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run precommit"
+    }
+  },
+  "devDependencies": {
+    "@testing-library/user-event": "^7.2.1",
+    "@types/chai": "4.2.16",
+    "@types/mocha": "8.2.2",
+    "@types/node": "^14.11.8",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "babel-eslint": "10.1.0",
+    "chai": "4.3.4",
+    "cross-env": "7.0.2",
+    "eslint": "7.11.0",
+    "eslint-config-prettier": "6.12.0",
+    "eslint-config-standard": "14.1.1",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-prettier": "3.1.4",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1",
+    "gh-pages": "3.1.0",
+    "husky": "4.3.0",
+    "jsdoc": "3.6.6",
+    "microbundle-crl": "0.13.11",
+    "mocha": "8.3.2",
+    "nodemon": "2.0.7",
+    "npm-check": "5.9.2",
+    "npm-run-all": "4.1.5",
+    "nyc": "15.1.0",
+    "prettier": "2.1.2",
+    "pretty-quick": "3.0.2",
+    "prop-types": "15.7.2",
+    "ts-node": "9.1.1",
+    "typescript": "^4.0.3"
+  },
+  "files": [
+    "dist"
+  ]
+}

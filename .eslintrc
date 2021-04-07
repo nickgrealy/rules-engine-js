@@ -1,0 +1,23 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "standard",
+    "plugin:prettier/recommended",
+    "prettier/standard",
+    "plugin:@typescript-eslint/eslint-recommended"
+  ],
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "ecmaFeatures": {
+      "legacyDecorators": true,
+      "jsx": true
+    }
+  },
+  "rules": {
+    "space-before-function-paren": 0,
+    "import/export": 0
+  }
+}

@@ -1,24 +1,35 @@
-# RulesEngine
+# rules-engine-js
 
-A Javascript Rules Engine
+[![GitHub license](https://img.shields.io/github/license/mountain-pass/rules-engine-js)](https://github.com/mountain-pass/rules-engine-js/blob/master/LICENSE)
+[![NPM](https://img.shields.io/npm/v/@mountainpass/rules-engine-js.svg)](https://www.npmjs.com/package/@mountainpass/rules-engine-js)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-## Example Usage
+# Overview
 
-- [Simple Example](http://jsfiddle.net/nickg1/mjahomzu/)
+Provides a javascript library for creating and executing decision tables.
 
-## TODO
+## Install
 
-- Test performance
-- Build treemap for rule matching (better performance)
-- Provide sample functions for - validation, cardinality, visibility, list values, default values, hint text
-- Allow contextual functions e.g. sh('id'), html('id2') i.e. no need for qualification
- 
+Install from NPM
 
-Add functions to programatically:
+```bash
+npm i @mountainpass/rules-engine-js
+```
 
-- add onchange/blur listeners
-- retrieve values from form types
-- perform cardinality, visibility, list values, default value, hint text, validation, focus or rules evaluation, set/clear value
+## Usage
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/nickgrealy/rulesenginejs/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+### The bare minimum
 
+todo
+
+### Full example
+
+Please see the unit tests for [all usage examples](src/index.test.ts).
+
+## Configuration
+
+Please see the unit tests for [all configuration examples](src/index.test.ts).
+
+## License
+
+Apache 2.0 © [nickgrealy](https://github.com/nickgrealy)
